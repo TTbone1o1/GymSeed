@@ -1,0 +1,42 @@
+//
+//  AddPhotoPrompt.swift
+//  GymSeed
+//
+//  Created by Abraham may on 8/3/25.
+//
+
+import SwiftUI
+
+struct AddPhotoPrompt: View {
+    @State private var showPopup = false
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("Add a Photo to start editing")
+                .font(.headline)
+
+            Button(action: {
+                showPopup = true
+            }) {
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: "#3664E9"))
+                        .frame(width: 67, height: 67)
+
+                    Image(systemName: "plus")
+                        .foregroundColor(.white)
+                        .font(.system(size: 20, weight: .bold))
+                }
+            }
+            .alert("The camera needs to be here", isPresented: $showPopup) {
+                Button("OK", role: .cancel) { }
+            }
+        }
+        .padding(.bottom, 40)
+    }
+}
+
+
+#Preview{
+    AddPhotoPrompt()
+}
