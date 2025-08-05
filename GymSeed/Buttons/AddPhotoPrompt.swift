@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AddPhotoPrompt: View {
-    @State private var showPopup = false
+    @State private var showCamera = false
 
     var body: some View {
         VStack(spacing: 16) {
@@ -16,7 +16,7 @@ struct AddPhotoPrompt: View {
                 .font(.headline)
 
             Button(action: {
-                showPopup = true
+                showCamera = true
             }) {
                 ZStack {
                     Circle()
@@ -28,9 +28,10 @@ struct AddPhotoPrompt: View {
                         .font(.system(size: 20, weight: .bold))
                 }
             }
-            .alert("The camera needs to be here", isPresented: $showPopup) {
-                Button("OK", role: .cancel) { }
+            .fullScreenCover(isPresented: $showCamera) {
+                CameraUi()
             }
+
         }
         .padding(.bottom, 40)
     }

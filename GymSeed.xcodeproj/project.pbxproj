@@ -6,13 +6,34 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CD895DA92E419F2400DBB2C5 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = CD895DA82E419F2400DBB2C5 /* FirebaseAuth */; };
+		CD895DAB2E419F2400DBB2C5 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = CD895DAA2E419F2400DBB2C5 /* FirebaseDatabase */; };
+		CD895DAD2E419F2400DBB2C5 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = CD895DAC2E419F2400DBB2C5 /* FirebaseFirestore */; };
+		CD895DAF2E419F2400DBB2C5 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = CD895DAE2E419F2400DBB2C5 /* FirebaseStorage */; };
+		CD895DB12E41A5CA00DBB2C5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = CD895DB02E41A5CA00DBB2C5 /* FirebaseAnalytics */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		CD895D6E2E2431E200DBB2C5 /* GymSeed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GymSeed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CD895DB32E41A8A000DBB2C5 /* Exceptions for "GymSeed" folder in "GymSeed" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				infos/Info.plist,
+			);
+			target = CD895D6D2E2431E200DBB2C5 /* GymSeed */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CD895D702E2431E200DBB2C5 /* GymSeed */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CD895DB32E41A8A000DBB2C5 /* Exceptions for "GymSeed" folder in "GymSeed" target */,
+			);
 			path = GymSeed;
 			sourceTree = "<group>";
 		};
@@ -23,6 +44,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD895DAB2E419F2400DBB2C5 /* FirebaseDatabase in Frameworks */,
+				CD895DAF2E419F2400DBB2C5 /* FirebaseStorage in Frameworks */,
+				CD895DA92E419F2400DBB2C5 /* FirebaseAuth in Frameworks */,
+				CD895DB12E41A5CA00DBB2C5 /* FirebaseAnalytics in Frameworks */,
+				CD895DAD2E419F2400DBB2C5 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +91,11 @@
 			);
 			name = GymSeed;
 			packageProductDependencies = (
+				CD895DA82E419F2400DBB2C5 /* FirebaseAuth */,
+				CD895DAA2E419F2400DBB2C5 /* FirebaseDatabase */,
+				CD895DAC2E419F2400DBB2C5 /* FirebaseFirestore */,
+				CD895DAE2E419F2400DBB2C5 /* FirebaseStorage */,
+				CD895DB02E41A5CA00DBB2C5 /* FirebaseAnalytics */,
 			);
 			productName = GymSeed;
 			productReference = CD895D6E2E2431E200DBB2C5 /* GymSeed.app */;
@@ -94,6 +125,9 @@
 			);
 			mainGroup = CD895D652E2431E200DBB2C5;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CD895DA72E419F2400DBB2C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CD895D6F2E2431E200DBB2C5 /* Products */;
 			projectDirPath = "";
@@ -253,6 +287,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GymSeed/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Take photo please";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -292,6 +328,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GymSeed/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Take photo please";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -341,6 +379,45 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CD895DA72E419F2400DBB2C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CD895DA82E419F2400DBB2C5 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD895DA72E419F2400DBB2C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		CD895DAA2E419F2400DBB2C5 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD895DA72E419F2400DBB2C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		CD895DAC2E419F2400DBB2C5 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD895DA72E419F2400DBB2C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		CD895DAE2E419F2400DBB2C5 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD895DA72E419F2400DBB2C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		CD895DB02E41A5CA00DBB2C5 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD895DA72E419F2400DBB2C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CD895D662E2431E200DBB2C5 /* Project object */;
 }
