@@ -22,7 +22,7 @@
 		CD895DB32E41A8A000DBB2C5 /* Exceptions for "GymSeed" folder in "GymSeed" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				infos/Info.plist,
+				Info.plist,
 			);
 			target = CD895D6D2E2431E200DBB2C5 /* GymSeed */;
 		};
