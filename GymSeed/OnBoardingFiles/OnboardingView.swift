@@ -11,6 +11,7 @@ struct OnboardingView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @State private var step = 0
     @State private var name = ""
+    var onComplete: () -> Void
 
 
 
@@ -59,6 +60,6 @@ struct OnboardingView: View {
     }
 }
 
-#Preview {
-    OnboardingView()
-}
+//#Preview {
+//    OnboardingView()
+//}
