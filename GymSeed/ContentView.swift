@@ -33,7 +33,8 @@ struct ContentView: View {
             AddPhotoPrompt()
             .padding(.bottom, 40)
         }
-        .padding()
+        .padding([.horizontal, .bottom])          // keep side + bottom padding
+                .ignoresSafeArea(.container, edges: .top)
     }
 }
 

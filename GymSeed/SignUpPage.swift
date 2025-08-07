@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SignUpPage: View {
-    var onSignedIn: () -> Void
+    var onSignedIn: () -> Void = {}
 
     var body: some View {
         VStack {

@@ -7,24 +7,22 @@
 
 import SwiftUI
 
+/// Shows the appropriate screen based on auth + onboarding status.
+@MainActor
 struct RootView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-    @EnvironmentObject var authViewModel: AuthViewModel
-
-    @State private var hasSignedIn: Bool = false
+    @EnvironmentObject private var authVM: AuthViewModel
 
     var body: some View {
         Group {
-            if !hasSignedIn {
-                SignUpPage(onSignedIn: {
-                    hasSignedIn = true
-                })
+            if !authVM.didLoadAuthState {
+                ProgressView("Checking session…")          // ← no flicker
+            } else if authVM.user == nil {
+                SignUpPage()
             } else if !hasCompletedOnboarding {
-                OnboardingView(onComplete: {
-                    hasCompletedOnboarding = true
-                })
+                OnboardingView { hasCompletedOnboarding = true }
             } else {
-                ContentView()
+                MainPagerView()
             }
         }
     }
