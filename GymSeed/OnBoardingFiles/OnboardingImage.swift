@@ -26,5 +26,5 @@ struct OnboardingImage: View {
 }
 
 #Preview {
-    OnboardingImage(imageName: "image1")
+    OnboardingImage(imageName: "image11")
 }

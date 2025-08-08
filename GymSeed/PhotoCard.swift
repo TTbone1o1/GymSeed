@@ -26,5 +26,5 @@ struct PhotoCard: View {
 }
 
 #Preview {
-    PhotoCard(imageName: "image1", offset: CGSize(width: 0, height: 0), rotation: 0)
+    PhotoCard(imageName: "image11", offset: CGSize(width: 0, height: 0), rotation: 0)
 }

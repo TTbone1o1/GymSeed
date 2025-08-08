@@ -13,7 +13,7 @@ struct ContentView: View {
             
             ZStack {
                   // 8 rectangles with different offsets]
-                PhotoCard(imageName: "image1", offset: CGSize(width: -140, height: 10), rotation: -20)
+                PhotoCard(imageName: "image11", offset: CGSize(width: -140, height: 10), rotation: -20)
                 PhotoCard(imageName: "image2", offset: CGSize(width: -270, height: 150), rotation: -20)
                 PhotoCard(imageName: "image3", offset: CGSize(width: -75, height: -150), rotation: 20)
                 PhotoCard(imageName: "image8", offset: CGSize(width: -125, height: -175), rotation: -15)
@@ -33,8 +33,6 @@ struct ContentView: View {
             AddPhotoPrompt()
             .padding(.bottom, 40)
         }
-        .padding([.horizontal, .bottom])          // keep side + bottom padding
-                .ignoresSafeArea(.container, edges: .top)
     }
 }
 

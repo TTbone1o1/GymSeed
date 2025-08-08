@@ -26,7 +26,7 @@ struct OnboardingView: View {
                     },
                     isButtonEnabled: true,
                     customVisual: AnyView(
-                        OnboardingImage(imageName: "image1")
+                        OnboardingImage(imageName: "image11")
                     )
                 )
             } else if step == 1 {
