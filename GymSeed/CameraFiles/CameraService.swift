@@ -61,8 +61,22 @@ class CameraService: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
 
     func capturePhoto() {
         let settings = AVCapturePhotoSettings()
+
+        if output.isHighResolutionCaptureEnabled {
+            settings.isHighResolutionPhotoEnabled = true
+        }
+
+        switch output.maxPhotoQualityPrioritization {
+        case .quality:  settings.photoQualityPrioritization = .quality
+        case .balanced: settings.photoQualityPrioritization = .balanced
+        case .speed:    settings.photoQualityPrioritization = .speed
+        @unknown default: settings.photoQualityPrioritization = .balanced
+        }
+
         output.capturePhoto(with: settings, delegate: self)
     }
+
+
 
     // Save captured image
     func photoOutput(_ output: AVCapturePhotoOutput,

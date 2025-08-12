@@ -12,10 +12,14 @@ import SwiftUI
 struct MainPagerView: View {
     var body: some View {
         TabView {
-                    ContentView()
-                    ProfilePage()
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .ignoresSafeArea(.container, edges: .top)  // swipe-only, no dots
+            ContentView()
+            ProfilePage()
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .ignoresSafeArea(.container, edges: .top)
     }
+}
+
+#Preview {
+    MainPagerView()
 }

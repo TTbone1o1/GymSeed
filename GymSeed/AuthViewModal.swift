@@ -13,9 +13,9 @@ final class AuthViewModel: ObservableObject {
     @Published private(set) var user: User?
     @Published var didLoadAuthState = false
     @Published var authError: Error?
-
+    
     private var handle: AuthStateDidChangeListenerHandle?
-
+    
     init(auth: Auth = .auth()) {
         handle = auth.addStateDidChangeListener { [weak self] _, user in
             self?.user = user
@@ -23,11 +23,11 @@ final class AuthViewModel: ObservableObject {
             Task { await self?.ensureUserIsStillValid(user) }   // your existing check
         }
     }
-
+    
     deinit {
         if let handle { Auth.auth().removeStateDidChangeListener(handle) }
     }
-
+    
     /// Refreshes the user record; if it no longer exists, signs out.
     private func ensureUserIsStillValid(_ user: User?) async {
         guard let user else { return }
@@ -38,21 +38,21 @@ final class AuthViewModel: ObservableObject {
             await signOut(clearOnboarding: false)                 // see below
         }
     }
-
+    
     /// Centralised sign-out helper so you can also call it from a “Log out” button.
-    func signOut(clearOnboarding: Bool = true) async {
-           do {
-               try Auth.auth().signOut()
-           } catch {
-               authError = error                     // ← now compiles
-           }
-
-           user = nil                               // reset published state
-
-           if clearOnboarding {
-               UserDefaults.standard
-                   .set(false, forKey: "hasCompletedOnboarding")
-           }
-       }
+    func signOut(clearOnboarding: Bool = false) async {
+        do {
+            try Auth.auth().signOut()
+        } catch {
+            authError = error                     // ← now compiles
+        }
+        
+        user = nil                               // reset published state
+        
+        if clearOnboarding {
+            UserDefaults.standard
+                .set(false, forKey: "hasCompletedOnboarding")
+        }
+    }
     
 }

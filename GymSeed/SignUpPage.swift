@@ -8,15 +8,27 @@
 import SwiftUI
 
 struct SignUpPage: View {
-    var onSignedIn: () -> Void = {}
-
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             Text("Sign Up")
-                .font(.largeTitle)
+                .font(.system(size: 40, weight: .bold, design: .rounded))
                 .bold()
-
-            AppleSignInButton(onSuccess: onSignedIn)
+            
+            AppleSignInButton { isNew, fullName in
+                if isNew {
+                    // Create users/{uid} in Firestore
+                    Task {
+                        await UserProvisioning.createUserIfNeeded(
+                            isNewUser: true,
+                            fullName: fullName
+                        )
+                    }
+                    // Ensure RootView routes to Onboarding next
+                    hasCompletedOnboarding = false
+                }
+            }
         }
         .padding()
     }

@@ -11,9 +11,10 @@ import CryptoKit
 import FirebaseAuth
 
 struct AppleSignInButton: View {
-    var onSuccess: () -> Void
+    var onAuthResult: (_ isNewUser: Bool, _ fullName: PersonNameComponents?) -> Void
+    
     @State private var currentNonce: String?
-
+    
     var body: some View {
         SignInWithAppleButton(.continue) { request in
             let nonce = randomNonceString()
@@ -25,63 +26,64 @@ struct AppleSignInButton: View {
             case .success(let authorization):
                 handleAuthorization(authorization)
             case .failure(let error):
-                print("Sign in failed: \(error.localizedDescription)")
+                if let e = error as? ASAuthorizationError, e.code == .canceled {
+                    print("Sign in canceled")
+                } else {
+                    print("Sign in failed: \(error.localizedDescription)")
+                }
             }
         }
         .signInWithAppleButtonStyle(.black)
         .frame(height: 45)
     }
-
+    
+    @MainActor
     private func handleAuthorization(_ authorization: ASAuthorization) {
-        guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
-              let identityTokenData = appleIDCredential.identityToken,
-              let identityTokenString = String(data: identityTokenData, encoding: .utf8),
-              let nonce = currentNonce else {
-            print("Failed to get credentials")
+        guard
+            let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
+            let tokenData = appleIDCredential.identityToken,
+            let idToken = String(data: tokenData, encoding: .utf8),
+            let nonce = currentNonce
+        else {
+            print("Missing Apple credentials/nonce")
             return
         }
-
+        
+        currentNonce = nil
+        
         let credential = OAuthProvider.appleCredential(
-            withIDToken: identityTokenString,
+            withIDToken: idToken,
             rawNonce: nonce,
             fullName: appleIDCredential.fullName
         )
-
+        
         Auth.auth().signIn(with: credential) { authResult, error in
             if let error = error {
                 print("Firebase sign-in failed: \(error.localizedDescription)")
-            } else {
-                print("✅ Firebase sign-in succeeded")
-                onSuccess()
+                return
+            }
+            let isNew = authResult?.additionalUserInfo?.isNewUser ?? false
+            // Report back whether this is a brand-new account + the Apple fullName (may be nil)
+            DispatchQueue.main.async {
+                onAuthResult(isNew, appleIDCredential.fullName)
             }
         }
     }
-
+    
+    // Faster, unbiased nonce generator shown in Firebase docs
     private func randomNonceString(length: Int = 32) -> String {
-        let charset: [Character] =
-            Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-        var result = ""
-        var remainingLength = length
-
-        while remainingLength > 0 {
-            var randomBytes = [UInt8](repeating: 0, count: 16)
-            let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
-
-            if errorCode != errSecSuccess {
-                fatalError("Unable to generate nonce.")
-            }
-
-            randomBytes.forEach { byte in
-                if remainingLength > 0 && byte < charset.count {
-                    result.append(charset[Int(byte)])
-                    remainingLength -= 1
-                }
-            }
+        precondition(length > 0)
+        var randomBytes = [UInt8](repeating: 0, count: length)
+        let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
+        if errorCode != errSecSuccess {
+            fatalError("Unable to generate nonce.")
         }
-
-        return result
+        let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        let nonceChars = randomBytes.map { charset[Int($0) % charset.count] }
+        return String(nonceChars)
     }
-
+    
+    // Firebase expects a hex string of the SHA-256 digest
     private func sha256(_ input: String) -> String {
         let inputData = Data(input.utf8)
         let hashed = SHA256.hash(data: inputData)
