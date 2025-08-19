@@ -14,8 +14,12 @@ struct ContentView: View {
         VStack {
             GeometryReader { geo in
                 ZStack {
-                    if feed.posts.isEmpty {
-                        // 🌟 Your original collage (unchanged)
+                    if !feed.didLoad {
+                        // First load → show a spinner instead of flashing the collage
+                        ProgressView("Loading…")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if feed.posts.isEmpty {
+                        // 🌟 Your original collage
                         ZStack {
                             PhotoCard(imageName: "image11", offset: CGSize(width: -140, height: -50), rotation: -20)
                             PhotoCard(imageName: "image2",  offset: CGSize(width: -270, height:  80), rotation: -20)
@@ -31,8 +35,8 @@ struct ContentView: View {
                                 .offset(y: 150)
                         }
                     } else {
-                        // 📜 Scrollable feed (26pt gaps, caption centered on image)
-                        FeedView()
+                        // 📜 Scrollable feed (26pt gaps)
+                        FeedView(posts: feed.posts)   // ← pass data in
                     }
                 }
                 .frame(width: geo.size.width, height: geo.size.height, alignment: .center)
@@ -44,9 +48,9 @@ struct ContentView: View {
 
             Spacer()
 
-      
-                    AddPhotoPrompt(hasPosted: !feed.posts.isEmpty)
-             
+            // Show text + button when no posts; button-only otherwise
+            AddPhotoPrompt(hasPosted: !feed.posts.isEmpty)
+                .padding(.bottom, 40)
         }
         .onAppear { Task { @MainActor in feed.start() } }
         .onDisappear { Task { @MainActor in feed.stop() } }

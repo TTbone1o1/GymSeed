@@ -21,18 +21,21 @@ struct PostItem: Identifiable {
 @MainActor
 final class FeedStore: ObservableObject {
     @Published var posts: [PostItem] = []
+    @Published var didLoad = false        // ← add this
     private var listener: ListenerRegistration?
 
     func start() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         stop()
+        didLoad = false
 
         listener = Firestore.firestore()
+            .collection("users")
+            .document(uid)
             .collection("posts")
-            .whereField("uid", isEqualTo: uid)
             .order(by: "createdAt", descending: true)
             .addSnapshotListener { [weak self] snap, err in
-                if let err { print("❌ feed listener:", err.localizedDescription); return }
+                if let err { print("❌ feed listener:", err.localizedDescription); self?.didLoad = true; return }
                 Task { @MainActor in
                     self?.posts = snap?.documents.map { doc in
                         let d = doc.data()
@@ -41,14 +44,17 @@ final class FeedStore: ObservableObject {
                             imageURL: d["imageURL"] as? String ?? "",
                             caption: d["caption"] as? String ?? "",
                             createdAt: d["createdAt"] as? Timestamp,
-                            uid: d["uid"] as? String ?? ""
+                            uid: uid
                         )
                     } ?? []
+                    self?.didLoad = true
                 }
             }
+
     }
 
     func stop() {
-        listener?.remove(); listener = nil
+        listener?.remove()
+        listener = nil
     }
 }

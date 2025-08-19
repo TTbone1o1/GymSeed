@@ -9,19 +9,17 @@
 import SwiftUI
 
 struct FeedView: View {
-    @StateObject private var store = FeedStore()
+    let posts: [PostItem]              // ← data passed in
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 26) {            // ← 26pt gap between posts
-                ForEach(store.posts) { post in
+            LazyVStack(spacing: 26) {  // 26pt gap
+                ForEach(posts) { post in
                     PostedCard(imageURL: post.imageURL, caption: post.caption)
-                        .frame(maxWidth: .infinity) // center the 313px card
+                        .frame(maxWidth: .infinity)
                 }
             }
             .padding(.vertical, 16)
         }
-        .onAppear { Task { @MainActor in store.start() } }
-        .onDisappear { Task { @MainActor in store.stop() } }
     }
 }

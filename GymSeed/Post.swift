@@ -65,7 +65,7 @@ enum PostService {
             throw error
         }
 
-        // 3) Create Firestore doc
+        // 3) Create Firestore doc(s) — only under users/{uid}/posts/{postId}
         let doc: [String: Any] = [
             "uid": uid,
             "caption": caption,
@@ -73,16 +73,24 @@ enum PostService {
             "createdAt": FieldValue.serverTimestamp()
         ]
 
+        let db = Firestore.firestore()
+        let batch = db.batch()
+
+        let userPostRef = db.collection("users")
+            .document(uid)
+            .collection("posts")
+            .document(postId)
+
+        batch.setData(doc, forDocument: userPostRef)
+
         do {
-            try await Firestore.firestore()
-                .collection("posts")
-                .document(postId)
-                .setData(doc)
-            print("📝 Firestore doc created: posts/\(postId)")
+            try await batch.commit()
+            print("📝 Firestore doc created: users/\(uid)/posts/\(postId)")
         } catch {
             print("❌ Firestore write failed:", error)
             throw error
         }
+
 
         return postId
     }
