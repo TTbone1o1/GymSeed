@@ -5,50 +5,85 @@
 //  Created by Abraham may on 8/4/25.
 //
 
-//
-//  CameraUi.swift
-//  GymSeed
-//
-
 import SwiftUI
 
 struct CameraUi: View {
     @StateObject private var camera = CameraService()
     @Environment(\.dismiss) private var dismiss
 
-    // Preview state
     @State private var previewImage: UIImage? = nil
     @State private var caption: String = ""
     @State private var isPosting = false
     @State private var errorText: String?
+    @FocusState private var captionFocused: Bool
 
-    /// Optional hook if the parent wants to react after a successful post.
     var onPosted: (() -> Void)? = nil
 
     var body: some View {
         ZStack {
             if let img = previewImage {
                 // ======= FULL-SCREEN PREVIEW =======
-                GeometryReader { geo in
-                    Image(uiImage: img)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .clipped()
-                        .ignoresSafeArea()
-                }
+                ZStack {
+                    Color.black.ignoresSafeArea()
 
-                // Bottom fade for legibility
-                LinearGradient(colors: [.clear, .black.opacity(0.55)],
-                               startPoint: .center, endPoint: .bottom)
+                    GeometryReader { geo in
+                        Image(uiImage: img)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)   // fill both dimensions, crop if needed
+                            .frame(width: geo.size.width, height: geo.size.height)
+                            .clipped()                         // cut off overflow instead of letterbox
+                    }
                     .ignoresSafeArea()
-                    .allowsHitTesting(false)
 
-                VStack {
-                    // Top-left back/retake
+
+                    // Centered caption (stays centered even when keyboard shows)
+                    TextField("Write a caption", text: $caption, axis: .vertical)
+                        .focused($captionFocused)
+                        .multilineTextAlignment(.center)
+                        .textFieldStyle(.plain)
+                        .padding(.vertical, 12)
+                        .frame(width: 270)
+                        .background(.thinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                        .zIndex(1)
+
+                    // Bottom Post button (fixed; won’t be pushed by keyboard)
+                    Button {
+                        Task {
+                            guard let img = previewImage else { return }
+                            isPosting = true; errorText = nil
+                            do {
+                                _ = try await PostService.createPost(
+                                    image: img,
+                                    caption: caption.trimmingCharacters(in: .whitespacesAndNewlines)
+                                )
+                                onPosted?()
+                                dismiss()
+                            } catch {
+                                errorText = error.localizedDescription
+                            }
+                            isPosting = false
+                        }
+                    } label: {
+                        Text(isPosting ? "Posting…" : "Post")
+                            .fontWeight(.semibold)
+                            .frame(width: 270, height: 76)
+                            .background(Color.white)
+                            .foregroundColor(.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 37, style: .continuous))
+                            .shadow(radius: 2, y: 1)
+                    }
+                    .disabled(isPosting)
+                    .padding(.bottom, 16)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .zIndex(1)
+                }
+                // ✅ Keep the back button ABOVE everything using an overlay
+                .overlay(alignment: .topLeading) {
                     HStack {
                         Button {
-                            // Retake: go back to live camera
                             previewImage = nil
                             caption = ""
                             camera.start()
@@ -56,62 +91,13 @@ struct CameraUi: View {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(.white)
                                 .padding(12)
-                                .background(Color.black.opacity(0.35))
+                                .background(Color.black.opacity(0.5)) // more contrast on bright images
                                 .clipShape(Circle())
                         }
-                        Spacer()
+                        Spacer(minLength: 0)
                     }
-                    .padding(.top, 12)
                     .padding(.horizontal, 16)
-
-                    Spacer()
-
-                    // Caption + Post
-                    VStack(spacing: 12) {
-                        TextField("Write a caption", text: $caption, axis: .vertical)
-                            .textFieldStyle(.plain)
-                            .padding(12)
-                            .background(Color.white.opacity(0.95))
-                            .cornerRadius(12)
-                            .padding(.horizontal, 16)
-
-                        Button {
-                            Task {
-                                guard let img = previewImage else { return }
-                                isPosting = true; errorText = nil
-                                do {
-                                    _ = try await PostService.createPost(
-                                        image: img,
-                                        caption: caption.trimmingCharacters(in: .whitespacesAndNewlines)
-                                    )
-                                    onPosted?()
-                                    dismiss()       // close camera after posting
-                                } catch {
-                                    errorText = error.localizedDescription
-                                }
-                                isPosting = false
-                            }
-                        } label: {
-                            Text(isPosting ? "Posting…" : "Post")
-                                .fontWeight(.semibold)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(Color.white)   // white button
-                                .foregroundColor(.black)   // black text
-                                .cornerRadius(14)
-                                .shadow(radius: 2, y: 1)
-                        }
-                        .padding(.horizontal, 16)
-                        .disabled(isPosting)
-
-                        if let errorText {
-                            Text(errorText)
-                                .font(.footnote)
-                                .foregroundColor(.white)
-                                .padding(.bottom, 8)
-                        }
-                    }
-                    .padding(.bottom, 18)
+                    .padding(.top, 16) // add a little top inset; adjust if needed per device
                 }
                 .statusBar(hidden: true)
 
@@ -134,12 +120,28 @@ struct CameraUi: View {
                 }
             }
         }
+        .ignoresSafeArea(.keyboard) // keep layout stable when keyboard appears
+        .toolbar {
+            // Optional keyboard toolbar "Done"
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") { captionFocused = false }
+            }
+        }
         .onAppear { camera.start() }
         .onDisappear { camera.stop() }
         .onReceive(camera.$capturedImage.compactMap { $0 }) { image in
-            // Switch to preview mode and pause camera
             previewImage = image
-            camera.stop()
+
         }
+        .onTapGesture {
+            if captionFocused { captionFocused = false }
+        }
+        // Surface any posting errors with a lightweight alert
+        .alert("Error", isPresented: .constant(errorText != nil), actions: {
+            Button("OK") { errorText = nil }
+        }, message: {
+            Text(errorText ?? "")
+        })
     }
 }
