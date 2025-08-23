@@ -43,14 +43,15 @@ struct AddPhotoPrompt: View {
             showCamera = true
         } label: {
             ZStack {
-                Circle()
-                    .fill(Color(hex: "#3664E9"))
-                    .frame(width: 67, height: 67)
+                Circle().fill(Color(hex: "#3664E9")).frame(width: 67, height: 67)
                 Image(systemName: "camera.fill")
                     .foregroundColor(.white)
                     .font(.system(size: 20, weight: .bold))
             }
         }
+        .buttonStyle(.plain)        // ← no automatic backgrounds/highlights
+        .contentShape(Circle())     // tap target is the circle only
         .accessibilityLabel("Add photo")
     }
+
 }
