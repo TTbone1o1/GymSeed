@@ -40,10 +40,13 @@ enum ProfilePhotoService {
 
         // 3) Save to Firestore
         try await Firestore.firestore()
-            .collection("users")
-            .document(uid)
-            .setData(["photoURL": url.absoluteString], merge: true)
+          .collection("users")
+          .document(uid)
+          .setData(["photoURL": url.absoluteString], merge: true)
+
 
         return url.absoluteString
     }
 }
+
+

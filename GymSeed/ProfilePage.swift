@@ -9,10 +9,14 @@ import SwiftUI
 
 struct ProfilePage: View {
     var body: some View {
-        OnboardingUploadProfile()
-        Spacer()
+        VStack(spacing: 0) {
+            OnboardingUploadProfile()
+            Spacer()
+        }
+        .padding()
     }
 }
+
 
 #Preview {
     ProfilePage()

@@ -34,6 +34,7 @@ struct ContentView: View {
                                 .font(.system(size: 40, weight: .bold, design: .rounded))
                                 .offset(y: 150)
                         }
+                        .offset(y: -120)
                     } else {
                         // 📜 Scrollable feed (26pt gaps)
                         FeedView(posts: feed.posts)   // ← pass data in
@@ -42,6 +43,7 @@ struct ContentView: View {
                 }
                 .frame(width: geo.size.width, height: geo.size.height, alignment: .center)
                 .background(Color(.systemBackground))
+                .clipped(antialiased: true)
 //                .clipped()
                     }
                                .ignoresSafeArea()               // keep your full-bleed collage if you like
@@ -49,13 +51,13 @@ struct ContentView: View {
                                // ✅ Float the camera button — no white bar behind it
                                VStack {
                                    Spacer()
-                                   HStack {
+                              
                                        Spacer()
                                        AddPhotoPrompt(hasPosted: !feed.posts.isEmpty)
                                            .buttonStyle(.plain)
-                                           .padding(.trailing, 20)
+                                       
                                            .padding(.bottom, 20) // clears the home indicator
-                                   }
+                                  
                                }
                                .allowsHitTesting(true)
                            }
