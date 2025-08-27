@@ -37,7 +37,7 @@ struct CameraUi: View {
 
 
                     // Centered caption (stays centered even when keyboard shows)
-                    TextField("Write a caption", text: $caption, axis: .vertical)
+                    TextField("Write a captions", text: $caption, axis: .vertical)
                         .focused($captionFocused)
                         .multilineTextAlignment(.center)
                         .textFieldStyle(.plain)
