@@ -37,17 +37,22 @@ struct CameraUi: View {
 
 
                     // Centered caption (stays centered even when keyboard shows)
-                    TextField("Write a captions", text: $caption, axis: .vertical)
-                        .focused($captionFocused)
-                        .multilineTextAlignment(.center)
-                        .textFieldStyle(.plain)
-                        .padding(.vertical, 12)
-                        .frame(width: 270)
-                        .background(.thinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .padding(.horizontal, 16)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .zIndex(1)
+                    ZStack {
+                        if caption.isEmpty {
+                            Text("Write a caption")
+                                .foregroundColor(.white)
+                                .font(.system(size: 25, weight: .bold, design: .rounded))
+                                .multilineTextAlignment(.center)
+                        }
+                        
+                        TextField("", text: $caption, axis: .vertical)
+                            .focused($captionFocused)
+                            .multilineTextAlignment(.center)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 25, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                    }
+                    .zIndex(1)
 
                     // Bottom Post button (fixed; won’t be pushed by keyboard)
                     Button {
