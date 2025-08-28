@@ -34,3 +34,19 @@ enum UserProvisioning {
         }
     }
 }
+
+extension UserProvisioning {
+    static func updateDisplayName(_ name: String) async {
+        guard let user = Auth.auth().currentUser else { return }
+        let db = Firestore.firestore()
+        
+        do {
+            try await db.collection("users").document(user.uid)
+                .setData(["displayName": name], merge: true)
+            print("✅ Updated displayName for \(user.uid)")
+        } catch {
+            print("❌ Failed to update displayName:", error.localizedDescription)
+        }
+    }
+}
+

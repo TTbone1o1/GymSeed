@@ -43,17 +43,22 @@ struct OnboardingView: View {
                 )
             } else if step == 2 {
                 Onboarding(
-                        rotatingText: [""],
-                        buttonText: "Continue",
-                        onButtonTap: {
+                    rotatingText: [""],
+                    buttonText: "Continue",
+                    onButtonTap: {
+                        Task {
+                            await UserProvisioning.updateDisplayName(name)
                             hasCompletedOnboarding = true
-                        },
-                        isButtonEnabled: !name.trimmingCharacters(in: .whitespaces).isEmpty,
-                        customVisual: AnyView(
-                            OnboardingUserName(name: $name)
-                        )
+                            onComplete() // ← fire your completion handler if needed
+                        }
+                    },
+                    isButtonEnabled: !name.trimmingCharacters(in: .whitespaces).isEmpty,
+                    customVisual: AnyView(
+                        OnboardingUserName(name: $name)
                     )
+                )
             }
+
         }
         .animation(.easeInOut, value: step)
         .transition(.slide)

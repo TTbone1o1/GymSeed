@@ -73,6 +73,7 @@ struct CameraUi: View {
                         }
                     } label: {
                         Text(isPosting ? "Posting…" : "Post")
+                            .font(.system(size: 25, weight: .bold, design: .rounded))
                             .fontWeight(.semibold)
                             .frame(width: 270, height: 76)
                             .background(Color.white)
