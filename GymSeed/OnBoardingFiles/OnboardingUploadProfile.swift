@@ -25,6 +25,7 @@ struct OnboardingUploadProfile: View {
     @State private var isUploading = false
     @State private var isLoadingRemote = false
     @State private var errorMessage: String?
+    @Binding var didUpload: Bool
 
     var body: some View {
         VStack(spacing: 8) {
@@ -137,7 +138,8 @@ struct OnboardingUploadProfile: View {
 
             // Update what we display immediately
             if let url = URL(string: urlString) {
-                await MainActor.run { remoteURL = url }
+                await MainActor.run { remoteURL = url
+                    didUpload = true}
             }
         } catch {
             await MainActor.run { errorMessage = error.localizedDescription }

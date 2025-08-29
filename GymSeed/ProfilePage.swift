@@ -10,11 +10,13 @@ import FirebaseAuth
 import FirebaseFirestore
 
 struct ProfilePage: View {
-    @StateObject private var feed = FeedStore()   // 👈 use the same feed store
+    @StateObject private var feed = FeedStore()
+    @State private var profileURL: URL?
+// 👈 use the same feed store
 
     var body: some View {
         VStack(spacing: 20) {
-            OnboardingUploadProfile()
+            OnboardingUploadProfile(didUpload: .constant(false))
 
             Spacer()
 
@@ -40,7 +42,7 @@ struct ProfilePage: View {
             Spacer()
         }
         .padding(.top, 50)
-        .onAppear { feed.start() }   // 👈 starts listener
+        .onAppear { feed.start()  }   // 👈 starts listener
         .onDisappear { feed.stop() } // 👈 stops listener
     }
 }

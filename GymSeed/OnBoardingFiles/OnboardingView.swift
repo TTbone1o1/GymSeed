@@ -12,6 +12,7 @@ struct OnboardingView: View {
     @State private var step = 0
     @State private var name = ""
     var onComplete: () -> Void
+    @State private var didUpload = false
 
 
 
@@ -36,9 +37,9 @@ struct OnboardingView: View {
                     onButtonTap: {
                         step += 1
                     },
-                    isButtonEnabled: true,
+                    isButtonEnabled: didUpload,
                     customVisual: AnyView(
-                        OnboardingUploadProfile()
+                        OnboardingUploadProfile(didUpload: $didUpload)
                     )
                 )
             } else if step == 2 {
