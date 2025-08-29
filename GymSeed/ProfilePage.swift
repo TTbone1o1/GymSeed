@@ -6,16 +6,45 @@
 //
 
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
 
 struct ProfilePage: View {
+    @StateObject private var feed = FeedStore()   // 👈 use the same feed store
+
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 20) {
             OnboardingUploadProfile()
+
+            Spacer()
+
+            if !feed.didLoad {
+                ProgressView("Loading…")
+            } else if feed.posts.isEmpty {
+                Text("No posts yet")
+                    .foregroundColor(.gray)
+            } else {
+                ZStack {
+                    ForEach(feed.posts.indices.reversed(), id: \.self) { i in
+                        ProfilePostedCard(
+                            imageURL: feed.posts[i].imageURL,
+                            caption: feed.posts[i].caption
+                        )
+                        .rotationEffect(.degrees(Double(i) * 15 - 15))
+                    }
+                }
+                .frame(width: 200, height: 200)
+                .padding(.top, -170)
+            }
+
             Spacer()
         }
-        .padding()
+        .padding(.top, 50)
+        .onAppear { feed.start() }   // 👈 starts listener
+        .onDisappear { feed.stop() } // 👈 stops listener
     }
 }
+
 
 
 #Preview {

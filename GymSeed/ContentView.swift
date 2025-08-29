@@ -6,19 +6,22 @@
 //
 
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
 
 struct ContentView: View {
     @StateObject private var feed = FeedStore()
-
+    @State private var displayName: String?
+    
     var body: some View {
         ZStack {
-                    // main area
-                    GeometryReader { geo in
-                        ZStack {
-                            if !feed.didLoad {
-                                ProgressView("Loading…")
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            } else if feed.posts.isEmpty {
+            // main area
+            GeometryReader { geo in
+                ZStack {
+                    if !feed.didLoad {
+                        ProgressView("Loading…")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if feed.posts.isEmpty {
                         // 🌟 Your original collage
                         ZStack {
                             PhotoCard(imageName: "image11", offset: CGSize(width: -140, height: -50), rotation: -20)
@@ -37,33 +40,64 @@ struct ContentView: View {
                         .offset(y: -120)
                     } else {
                         // 📜 Scrollable feed (26pt gaps)
-                        FeedView(posts: feed.posts)   // ← pass data in
-//                            .padding(.top, 20)
+                        
+                        VStack() {
+                            if let name = displayName {
+                                Text("Welcome, \(name)!")
+                                    .font(.title2.bold())
+                                    .offset(y: 150)
+                            }
+                                
+                            
+                            FeedView(posts: feed.posts)   // ← your actual feed
+                        }
                     }
                 }
                 .frame(width: geo.size.width, height: geo.size.height, alignment: .center)
                 .background(Color(.systemBackground))
                 .clipped(antialiased: true)
-//                .clipped()
-                    }
-                               .ignoresSafeArea()               // keep your full-bleed collage if you like
+                //                .clipped()
+            }
+            .ignoresSafeArea()               // keep your full-bleed collage if you like
+            
+            // ✅ Float the camera button — no white bar behind it
+            VStack {
+                Spacer()
+                
+                Spacer()
+                AddPhotoPrompt(hasPosted: !feed.posts.isEmpty)
+                    .buttonStyle(.plain)
+                
+                    .padding(.bottom, 20) // clears the home indicator
+                
+            }
+            .allowsHitTesting(true)
+        }
+        .onAppear {
+            Task { @MainActor in
+                feed.start()
+                await loadDisplayName()
+            }
+        }
 
-                               // ✅ Float the camera button — no white bar behind it
-                               VStack {
-                                   Spacer()
-                              
-                                       Spacer()
-                                       AddPhotoPrompt(hasPosted: !feed.posts.isEmpty)
-                                           .buttonStyle(.plain)
-                                       
-                                           .padding(.bottom, 20) // clears the home indicator
-                                  
-                               }
-                               .allowsHitTesting(true)
-                           }
-                           .onAppear { Task { @MainActor in feed.start() } }
-                           .onDisappear { Task { @MainActor in feed.stop() } }
-                       }
+        .onDisappear { Task { @MainActor in feed.stop() } }
+    }
+    
+    private func loadDisplayName() async {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        do {
+            let doc = try await Firestore.firestore()
+                .collection("users")
+                .document(uid)
+                .getDocument()
+            self.displayName = doc.get("displayName") as? String
+        } catch {
+            print("❌ Failed to load display name:", error.localizedDescription)
+        }
+    }
 }
+
+
+
 
 #Preview { ContentView() }
