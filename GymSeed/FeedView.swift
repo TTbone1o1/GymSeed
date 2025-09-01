@@ -20,21 +20,9 @@ struct FeedView: View {
                         .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.vertical, 16)
+            .padding(.vertical, 110)
         }
         .background(Color.clear)
-        .modifier(TopMargin150())   // ← see helper below
-    }
-}
-
-// iOS17+: use contentMargins. Older iOS: use padding.
-private struct TopMargin150: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 17.0, *) {
-            content.contentMargins(.top, 150, for: .scrollContent)
-        } else {
-            content.padding(.top, 150)
-        }
     }
 }
 

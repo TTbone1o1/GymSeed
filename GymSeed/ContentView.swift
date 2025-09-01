@@ -41,16 +41,27 @@ struct ContentView: View {
                     } else {
                         // 📜 Scrollable feed (26pt gaps)
                         
-                        VStack() {
+                        VStack {
                             if let name = displayName {
-                                Text("Welcome, \(name)!")
-                                    .font(.title2.bold())
-                                    .offset(y: 150)
+                                HStack(spacing: 100) {
+                                    Text(name)
+                                        .font(.title2.bold())
+                                    
+                                    Button(action: {
+                                        // TODO: search action here
+                                        print("Search tapped")
+                                    }) {
+                                        Image(systemName: "magnifyingglass")
+                                            .font(.system(size: 28, weight: .bold))
+                                            .foregroundColor(.black)
+                                    }
+                                }
+                                .offset( x: 60, y: 90)
                             }
-                                
-                            
+
                             FeedView(posts: feed.posts)   // ← your actual feed
                         }
+
                     }
                 }
                 .frame(width: geo.size.width, height: geo.size.height, alignment: .center)

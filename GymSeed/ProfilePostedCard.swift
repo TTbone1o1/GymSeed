@@ -33,6 +33,7 @@ struct ProfilePostedCard: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(Color.white, lineWidth: 5)
             )
+            .shadow(color: Color.black.opacity(0.25), radius: 14.7, x: 3, y: 4)
 //            TODO come back if needed
 //            VStack {
 //                Spacer()
