@@ -12,6 +12,7 @@ import FirebaseFirestore
 struct ContentView: View {
     @StateObject private var feed = FeedStore()
     @State private var displayName: String?
+    @State private var showUserSearch = false
     
     var body: some View {
         ZStack {
@@ -43,27 +44,30 @@ struct ContentView: View {
                         
                         VStack {
                             if let name = displayName {
-                                HStack(spacing: 100) {
-                                    Text(name)
-                                        .font(.title2.bold())
-                                    
-                                    Button(action: {
-                                        // TODO: search action here
-                                        print("Search tapped")
-                                    }) {
-                                        Image(systemName: "magnifyingglass")
-                                            .font(.system(size: 28, weight: .bold))
-                                            .foregroundColor(.black)
+                                        HStack {
+                                            Text(name)
+                                                .font(.title2.bold())
+
+                                            Spacer()
+
+                                            Button(action: {
+                                                showUserSearch = true
+                                            }) {
+                                                Image(systemName: "magnifyingglass")
+                                                    .font(.system(size: 28, weight: .bold))
+                                                    .foregroundColor(.black)
+                                            }
+                                        }
+                                        .padding(.horizontal, 24)
+                                        .padding(.top, 80)
                                     }
-                                }
-                                .offset( x: 60, y: 90)
-                            }
 
                             FeedView(posts: feed.posts)   // ← your actual feed
                         }
 
                     }
                 }
+                
                 .frame(width: geo.size.width, height: geo.size.height, alignment: .center)
                 .background(Color(.systemBackground))
                 .clipped(antialiased: true)
@@ -84,6 +88,10 @@ struct ContentView: View {
             }
             .allowsHitTesting(true)
         }
+        .sheet(isPresented: $showUserSearch) {
+                    AllUsersView()
+                        .presentationDetents([.medium, .large])
+                }
         .onAppear {
             Task { @MainActor in
                 feed.start()
