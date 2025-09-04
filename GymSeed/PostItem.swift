@@ -15,7 +15,7 @@ struct PostItem: Identifiable {
     let imageURL: String
     let caption: String
     let createdAt: Timestamp?
-    let uid: String
+    let uid: String   // ✅ we need this so we know whose post it is
 }
 
 // FeedStore.swift
@@ -23,9 +23,9 @@ struct PostItem: Identifiable {
 final class FeedStore: ObservableObject {
     @Published var posts: [PostItem] = []
     @Published var didLoad = false
-    @Published var displayName: String?   // ← add this
+    @Published var displayName: String?
 
-    private var listener: ListenerRegistration?
+    private var listeners: [ListenerRegistration] = []
     private var profileListener: ListenerRegistration?
 
     func start() {
@@ -33,34 +33,57 @@ final class FeedStore: ObservableObject {
         stop()
         didLoad = false
 
-        // 🔹 Listen for posts
-        listener = Firestore.firestore()
-            .collection("users")
-            .document(uid)
-            .collection("posts")
-            .order(by: "createdAt", descending: true)
-            .addSnapshotListener { [weak self] snap, err in
-                if let err {
-                    print("❌ feed listener:", err.localizedDescription)
-                    self?.didLoad = true
-                    return
-                }
-                self?.posts = snap?.documents.compactMap { doc in
-                    let data = doc.data()
-                    return PostItem(
-                        id: doc.documentID,
-                        imageURL: data["imageURL"] as? String ?? "",
-                        caption: data["caption"] as? String ?? "",
-                        createdAt: data["createdAt"] as? Timestamp,
-                        uid: data["uid"] as? String ?? ""
-                    )
-                } ?? []
+        let db = Firestore.firestore()
+
+        // 1. Load following list
+        db.collection("users").document(uid).collection("following").getDocuments { [weak self] snap, err in
+            if let err = err {
+                print("❌ failed to load following:", err.localizedDescription)
                 self?.didLoad = true
+                return
             }
 
-        // 🔹 Listen for profile
-        profileListener = Firestore.firestore()
-            .collection("users")
+            var uids: [String] = [uid] // include self
+            if let docs = snap?.documents {
+                uids.append(contentsOf: docs.map { $0.documentID })
+            }
+
+            // 2. Listen for posts from all uids
+            for userId in uids {
+                let listener = db.collection("users")
+                    .document(userId)
+                    .collection("posts")
+                    .order(by: "createdAt", descending: true)
+                    .addSnapshotListener { snap, err in
+                        if let err = err {
+                            print("❌ post listener:", err.localizedDescription)
+                            return
+                        }
+
+                        var newPosts: [PostItem] = []
+                        for doc in snap?.documents ?? [] {
+                            let data = doc.data()
+                            newPosts.append(PostItem(
+                                id: doc.documentID,
+                                imageURL: data["imageURL"] as? String ?? "",
+                                caption: data["caption"] as? String ?? "",
+                                createdAt: data["createdAt"] as? Timestamp,
+                                uid: userId
+                            ))
+                        }
+
+                        // Replace posts for this userId and re-sort
+                        self?.replacePosts(for: userId, with: newPosts)
+                    }
+
+                self?.listeners.append(listener)
+            }
+
+            self?.didLoad = true
+        }
+
+        // 3. Listen for profile (optional)
+        profileListener = db.collection("users")
             .document(uid)
             .addSnapshotListener { [weak self] doc, err in
                 if let err {
@@ -71,10 +94,19 @@ final class FeedStore: ObservableObject {
             }
     }
 
+    private func replacePosts(for userId: String, with newPosts: [PostItem]) {
+        // Remove old posts from this user
+        posts.removeAll { $0.uid == userId }
+        // Add new ones
+        posts.append(contentsOf: newPosts)
+        // Re-sort
+        posts.sort { ($0.createdAt?.dateValue() ?? .distantPast) > ($1.createdAt?.dateValue() ?? .distantPast) }
+    }
+
     func stop() {
-        listener?.remove()
+        for l in listeners { l.remove() }
+        listeners.removeAll()
         profileListener?.remove()
-        listener = nil
         profileListener = nil
     }
 }
