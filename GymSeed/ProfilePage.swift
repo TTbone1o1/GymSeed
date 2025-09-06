@@ -10,9 +10,7 @@ import FirebaseAuth
 import FirebaseFirestore
 
 struct ProfilePage: View {
-    @StateObject private var feed = FeedStore()
-    @State private var profileURL: URL?
-// 👈 use the same feed store
+    @StateObject private var profileStore = ProfileStore()
 
     var body: some View {
         VStack(spacing: 20) {
@@ -21,19 +19,22 @@ struct ProfilePage: View {
 
             Spacer()
 
-            if !feed.didLoad {
+            if !profileStore.didLoad {
                 ProgressView("Loading…")
-            } else if feed.posts.isEmpty {
+            } else if profileStore.posts.isEmpty {
                 Text("No posts yet")
                     .foregroundColor(.gray)
             } else {
                 ZStack {
-                    ForEach(feed.posts.indices.reversed(), id: \.self) { i in
+                    let rotations: [Double] = [-9, -21.32, 20.25, 76.98]
+
+                    ForEach(Array(profileStore.posts.prefix(4).enumerated().reversed()), id: \.element.id) { index, post in
                         ProfilePostedCard(
-                            imageURL: feed.posts[i].imageURL,
-                            caption: feed.posts[i].caption
+                            imageURL: post.imageURL,
+                            caption: post.caption
                         )
-                        .rotationEffect(.degrees(Double(i) * 15 - 15))
+                        .rotationEffect(.degrees(rotations[index]))
+                        .offset(y: CGFloat(index) * 5) // small stagger
                     }
                 }
                 .frame(width: 200, height: 200)
@@ -43,12 +44,14 @@ struct ProfilePage: View {
             Spacer()
         }
         .padding(.top, 50)
-        .onAppear { feed.start()  }   // 👈 starts listener
-        .onDisappear { feed.stop() } // 👈 stops listener
+        .onAppear {
+            if let uid = Auth.auth().currentUser?.uid {
+                profileStore.start(for: uid)
+            }
+        }
+        .onDisappear { profileStore.stop() }
     }
 }
-
-
 
 #Preview {
     ProfilePage()
