@@ -14,8 +14,8 @@ struct PostItem: Identifiable {
     let id: String
     let imageURL: String
     let caption: String
-    let createdAt: Timestamp?
-    let uid: String   // ✅ we need this so we know whose post it is
+    let createdAt: Date   // always a Date in our app
+    let uid: String       // so we know whose post it is
 }
 
 // FeedStore.swift
@@ -67,10 +67,11 @@ final class FeedStore: ObservableObject {
                                 id: doc.documentID,
                                 imageURL: data["imageURL"] as? String ?? "",
                                 caption: data["caption"] as? String ?? "",
-                                createdAt: data["createdAt"] as? Timestamp,
+                                createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date(),
                                 uid: userId
                             ))
                         }
+
 
                         // Replace posts for this userId and re-sort
                         self?.replacePosts(for: userId, with: newPosts)
@@ -100,7 +101,8 @@ final class FeedStore: ObservableObject {
         // Add new ones
         posts.append(contentsOf: newPosts)
         // Re-sort
-        posts.sort { ($0.createdAt?.dateValue() ?? .distantPast) > ($1.createdAt?.dateValue() ?? .distantPast) }
+        posts.sort { $0.createdAt > $1.createdAt }
+
     }
 
     func stop() {

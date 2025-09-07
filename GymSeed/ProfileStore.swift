@@ -39,7 +39,7 @@ final class ProfileStore: ObservableObject {
                         id: doc.documentID,
                         imageURL: data["imageURL"] as? String ?? "",
                         caption: data["caption"] as? String ?? "",
-                        createdAt: data["createdAt"] as? Timestamp,
+                        createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date(),
                         uid: uid
                     )
                 } ?? []

@@ -10,9 +10,26 @@ import SwiftUI
 struct ProfilePostedCard: View {
     let imageURL: String
     let caption: String
-    
+    let createdAt: Date   // 🔹 Firestore date
+    var isSelected: Bool = false   // 🔹 new flag
+
+    // 🔹 formatter for "Aug 5"
+    private var dateText: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: createdAt)
+    }
+
     var body: some View {
-        ZStack {
+        VStack(spacing: 5) {
+            // 🔹 date pill ABOVE the image
+            Text(dateText)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.white)
+                .frame(width: 62, height: 30)
+                .background(Color.red)
+                .cornerRadius(22)
+
             AsyncImage(url: URL(string: imageURL)) { phase in
                 switch phase {
                 case .success(let img):
@@ -26,15 +43,14 @@ struct ProfilePostedCard: View {
                     Rectangle().fill(.gray.opacity(0.15))
                 }
             }
-            .frame(width: 133, height: 162) // profile size
+            .frame(
+                width: isSelected ? 217 : 133,
+                height: isSelected ? 268 : 162
+            )
             .clipped()
             .cornerRadius(16)
-            .overlay( // 🔹 white border
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.white, lineWidth: 5)
-            )
-            .shadow(color: Color.black.opacity(0.25), radius: 5, x: 3, y: 4)
-            .frame(width: 133, height: 162)
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(.white, lineWidth: 5))
+            .animation(.spring(), value: isSelected)   // smooth size change
         }
     }
 }

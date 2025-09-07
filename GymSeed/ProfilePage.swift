@@ -25,22 +25,9 @@ struct ProfilePage: View {
                 Text("No posts yet")
                     .foregroundColor(.gray)
             } else {
-                ZStack {
-                    let rotations: [Double] = [-9, -21.32, 20.25, 76.98]
-
-                    ForEach(Array(profileStore.posts.prefix(4).enumerated().reversed()), id: \.element.id) { index, post in
-                        ProfilePostedCard(
-                            imageURL: post.imageURL,
-                            caption: post.caption
-                        )
-                        .rotationEffect(.degrees(rotations[index]))
-                        .offset(y: CGFloat(index) * 5) // small stagger
-                    }
-                }
-                .frame(width: 200, height: 200)
-                .padding(.top, -170)
+                ProfileCarousel(posts: profileStore.posts)
+                    .padding(.top, 10)
             }
-
             Spacer()
         }
         .padding(.top, 50)
