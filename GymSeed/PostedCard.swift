@@ -26,17 +26,30 @@ struct PostedCard: View {
             .frame(width: 313, height: 421)
             .clipped()
             .cornerRadius(32)
+            .overlay(
+                RoundedRectangle(cornerRadius: 32)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.black.opacity(0.95), .clear]),
+                            startPoint: .bottom,
+                            endPoint: .center
+                        )
+                    )
+                    .cornerRadius(32)
+                    .blendMode(.multiply) // darkens instead of stacking color
+            )
 
             // Caption centered on the image
             VStack {
-                   Spacer() // pushes text down
-                   Text(caption)
-                       .multilineTextAlignment(.center)
-                       .font(.system(size: 25, weight: .bold, design: .rounded))
-                       .foregroundColor(.white)
-                       .padding(.bottom, 32) // 32 points from bottom
-               }
-               .frame(width: 313, height: 421)
+                Spacer()  // pushes text down
+                Text(caption)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 25, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .padding(.bottom, 32)  // 32 points from bottom
+
+            }
+            .frame(width: 313, height: 421)
         }
     }
 }

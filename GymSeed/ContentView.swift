@@ -44,23 +44,28 @@ struct ContentView: View {
                         
                         VStack {
                             if let name = displayName {
-                                        HStack {
-                                            Text(name)
-                                                .font(.title2.bold())
+                                ZStack {
+                                    // centered name
+                                    Text(name)
+                                        .font(.title2.bold())
 
-                                            Spacer()
-
-                                            Button(action: {
-                                                showUserSearch = true
-                                            }) {
-                                                Image(systemName: "magnifyingglass")
-                                                    .font(.system(size: 28, weight: .bold))
-                                                    .foregroundColor(.black)
-                                            }
-                                        }
-                                        .padding(.horizontal, 24)
-                                        .padding(.top, 80)
+                                    // button sitting 71pts to the right of the text
+                                    Button(action: {
+                                        showUserSearch = true
+                                    }) {
+                                        Image(systemName: "magnifyingglass")
+                                            .font(.system(size: 28, weight: .bold))
+                                            .foregroundColor(.black)
                                     }
+                                    .offset(x: 121) // 👈 pushes button 71pts to the right of center text
+                                }
+                                .padding(.horizontal, 24)
+                                .padding(.top, 80)
+                            }
+
+                            
+
+
 
                             FeedView(posts: feed.posts)   // ← your actual feed
                         }
