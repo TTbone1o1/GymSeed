@@ -11,6 +11,8 @@ import SwiftUI
 struct PostedCard: View {
     let imageURL: String
     let caption: String
+    let displayName: String
+    
     var body: some View {
         ZStack {
             AsyncImage(url: URL(string: imageURL)) { phase in
@@ -38,18 +40,27 @@ struct PostedCard: View {
                     .cornerRadius(32)
                     .blendMode(.multiply) // darkens instead of stacking color
             )
-
-            // Caption centered on the image
-            VStack {
-                Spacer()  // pushes text down
-                Text(caption)
-                    .multilineTextAlignment(.center)
-                    .font(.system(size: 25, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .padding(.bottom, 32)  // 32 points from bottom
-
-            }
-            .frame(width: 313, height: 421)
+            .overlay(
+                            // 👇 Badge in the top-left corner
+                            VStack {
+                                UserBadge(name: displayName)
+                                    .padding([.top, .leading], 12)
+                                Spacer()
+                            },
+                            alignment: .topLeading
+                        )
+                        .overlay(
+                            // 👇 Caption at bottom
+                            VStack {
+                                Spacer()
+                                Text(caption)
+                                    .multilineTextAlignment(.center)
+                                    .font(.system(size: 25, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .padding(.bottom, 32)
+                            }
+                            .frame(width: 313, height: 421)
+                        )
         }
     }
 }

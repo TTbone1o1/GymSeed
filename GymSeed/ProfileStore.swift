@@ -5,11 +5,9 @@
 //  Created by Abraham May on 9/6/25.
 //
 
-import Foundation
 import FirebaseAuth
 import FirebaseFirestore
-
-
+import Foundation
 
 @MainActor
 final class ProfileStore: ObservableObject {
@@ -33,16 +31,20 @@ final class ProfileStore: ObservableObject {
                     self?.didLoad = true
                     return
                 }
-                self?.posts = snap?.documents.compactMap { doc in
-                    let data = doc.data()
-                    return PostItem(
-                        id: doc.documentID,
-                        imageURL: data["imageURL"] as? String ?? "",
-                        caption: data["caption"] as? String ?? "",
-                        createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date(),
-                        uid: uid
-                    )
-                } ?? []
+                self?.posts =
+                    snap?.documents.compactMap { doc in
+                        let data = doc.data()
+                        return PostItem(
+                            id: doc.documentID,
+                            imageURL: data["imageURL"] as? String ?? "",
+                            caption: data["caption"] as? String ?? "",
+                            createdAt: (data["createdAt"] as? Timestamp)?
+                                .dateValue() ?? Date(),
+                            uid: uid,
+                            displayName: data["displayName"] as? String
+                                ?? "Unknown"  // 👈 directly from post
+                        )
+                    } ?? []
                 self?.didLoad = true
             }
     }
