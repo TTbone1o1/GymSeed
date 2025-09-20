@@ -20,33 +20,43 @@ final class ProfileStore: ObservableObject {
         stop()
         didLoad = false
 
-        listener = Firestore.firestore()
-            .collection("users")
-            .document(uid)
-            .collection("posts")
-            .order(by: "createdAt", descending: true)
-            .addSnapshotListener { [weak self] snap, err in
-                if let err = err {
-                    print("❌ profile posts listener:", err.localizedDescription)
-                    self?.didLoad = true
-                    return
-                }
-                self?.posts =
-                    snap?.documents.compactMap { doc in
+        let db = Firestore.firestore()
+
+        // 👇 First load user profile info (name + photoURL)
+        db.collection("users").document(uid).getDocument { [weak self] userDoc, _ in
+            guard let self else { return }
+            let userName = userDoc?.get("displayName") as? String ?? "Unknown"
+            let profilePic = userDoc?.get("photoURL") as? String ?? ""
+
+            // 👇 Then listen for their posts
+            self.listener = db.collection("users")
+                .document(uid)
+                .collection("posts")
+                .order(by: "createdAt", descending: true)
+                .addSnapshotListener { [weak self] snap, err in
+                    guard let self else { return }
+                    if let err = err {
+                        print("❌ profile posts listener:", err.localizedDescription)
+                        self.didLoad = true
+                        return
+                    }
+
+                    self.posts = snap?.documents.compactMap { doc in
                         let data = doc.data()
                         return PostItem(
                             id: doc.documentID,
                             imageURL: data["imageURL"] as? String ?? "",
                             caption: data["caption"] as? String ?? "",
-                            createdAt: (data["createdAt"] as? Timestamp)?
-                                .dateValue() ?? Date(),
+                            createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date(),
                             uid: uid,
-                            displayName: data["displayName"] as? String
-                                ?? "Unknown"  // 👈 directly from post
+                            displayName: userName,          // 👈 from parent user doc
+                            profilePictureURL: profilePic   // 👈 from parent user doc
                         )
                     } ?? []
-                self?.didLoad = true
-            }
+
+                    self.didLoad = true
+                }
+        }
     }
 
     func stop() {

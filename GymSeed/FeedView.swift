@@ -16,7 +16,7 @@ struct FeedView: View {
         ScrollView {
             LazyVStack(spacing: 35) {
                 ForEach(posts) { post in
-                    PostedCard(imageURL: post.imageURL, caption: post.caption, displayName: post.displayName)
+                    PostedCard(imageURL: post.imageURL, caption: post.caption, displayName: post.displayName, profilePictureURL: post.profilePictureURL)
                         .frame(maxWidth: .infinity)
                 }
             }

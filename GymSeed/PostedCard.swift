@@ -5,13 +5,13 @@
 //  Created by Abraham May on 8/10/25.
 //
 
-// PostedCard.swift
 import SwiftUI
 
 struct PostedCard: View {
     let imageURL: String
     let caption: String
     let displayName: String
+    let profilePictureURL: String   // 👈 added
     
     var body: some View {
         ZStack {
@@ -25,6 +25,7 @@ struct PostedCard: View {
                 @unknown default: Rectangle().fill(.gray.opacity(0.15))
                 }
             }
+            .transaction { $0.animation = nil } // 👈 add this
             .frame(width: 313, height: 421)
             .clipped()
             .cornerRadius(32)
@@ -38,29 +39,29 @@ struct PostedCard: View {
                         )
                     )
                     .cornerRadius(32)
-                    .blendMode(.multiply) // darkens instead of stacking color
+                    .blendMode(.multiply)
             )
             .overlay(
-                            // 👇 Badge in the top-left corner
-                            VStack {
-                                UserBadge(name: displayName)
-                                    .padding([.top, .leading], 12)
-                                Spacer()
-                            },
-                            alignment: .topLeading
-                        )
-                        .overlay(
-                            // 👇 Caption at bottom
-                            VStack {
-                                Spacer()
-                                Text(caption)
-                                    .multilineTextAlignment(.center)
-                                    .font(.system(size: 25, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white)
-                                    .padding(.bottom, 32)
-                            }
-                            .frame(width: 313, height: 421)
-                        )
+                // 👇 Badge in the top-left corner
+                VStack {
+                    UserBadge(name: displayName, profilePictureURL: profilePictureURL)
+                        .padding([.top, .leading], 12)
+                    Spacer()
+                },
+                alignment: .topLeading
+            )
+            .overlay(
+                // 👇 Caption at bottom
+                VStack {
+                    Spacer()
+                    Text(caption)
+                        .multilineTextAlignment(.center)
+                        .font(.system(size: 25, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .padding(.bottom, 32)
+                }
+                .frame(width: 313, height: 421)
+            )
         }
     }
 }

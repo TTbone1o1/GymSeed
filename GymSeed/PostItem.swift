@@ -14,14 +14,19 @@ struct PostItem: Identifiable {
     let imageURL: String
     let caption: String
     let createdAt: Date  // always a Date in our app
-    let uid: String  // so we know whose post it is
+    let uid: String      // so we know whose post it is
     let displayName: String
+    let profilePictureURL: String
 }
 
 //
 //  FeedStore.swift
 //  GymSeed
 //
+
+import FirebaseAuth
+import FirebaseFirestore
+import Foundation
 
 @MainActor
 final class FeedStore: ObservableObject {
@@ -60,7 +65,7 @@ final class FeedStore: ObservableObject {
                 self.didLoad = true
             }
 
-        // 👇 Profile listener for displayName
+        // 👇 Profile listener for *current* user's displayName
         profileListener = db.collection("users")
             .document(uid)
             .addSnapshotListener { [weak self] doc, err in
@@ -88,10 +93,11 @@ final class FeedStore: ObservableObject {
         for uid in newUids {
             if listeners[uid] == nil {
                 
-                // 👇 First get the user's profile for displayName
+                // 👇 First get the user's profile for displayName + photoURL
                 db.collection("users").document(uid).getDocument { userDoc, _ in
                     let userName = userDoc?.get("displayName") as? String ?? "Unknown"
-                    
+                    let profilePic = userDoc?.get("photoURL") as? String ?? ""
+
                     // 👇 Then attach listener for this user's posts
                     let listener = db.collection("users")
                         .document(uid)
@@ -112,9 +118,11 @@ final class FeedStore: ObservableObject {
                                         id: doc.documentID,
                                         imageURL: data["imageURL"] as? String ?? "",
                                         caption: data["caption"] as? String ?? "",
-                                        createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date(),
+                                        createdAt: (data["createdAt"] as? Timestamp)?
+                                            .dateValue() ?? Date(),
                                         uid: uid,
-                                        displayName: userName // 👈 from parent user doc
+                                        displayName: userName,          // 👈 from user doc
+                                        profilePictureURL: profilePic   // 👈 from user doc
                                     )
                                 )
                             }
