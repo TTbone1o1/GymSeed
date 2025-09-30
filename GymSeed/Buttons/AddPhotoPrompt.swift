@@ -21,6 +21,7 @@ struct AddPhotoPrompt: View {
                 VStack(spacing: 12) {
                     Text("Add a Photo to start editing")
                         .font(.headline)
+                        .foregroundColor(.white)
                     button
                 }
                 .padding(.bottom, 40)
