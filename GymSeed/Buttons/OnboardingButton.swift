@@ -18,8 +18,8 @@ struct OnboardingButton: View {
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity)
                 .frame(height: 62)
-                .background(isEnabled ? Color.blue : Color.black)
-                .foregroundColor(.white)
+                .background(isEnabled ? Color.white : Color.red)
+                .foregroundColor(.black)
                 .cornerRadius(40)
         }
         .frame(width: 291)

@@ -74,7 +74,6 @@ struct ContentView: View {
                 }
                 
                 .frame(width: geo.size.width, height: geo.size.height, alignment: .center)
-                .background(Color(.systemBackground))
                 .clipped(antialiased: true)
                 //                .clipped()
             }

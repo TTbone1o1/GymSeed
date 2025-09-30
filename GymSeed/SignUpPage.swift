@@ -14,6 +14,7 @@ struct SignUpPage: View {
         VStack(spacing: 16) {
             Text("Sign Up")
                 .font(.system(size: 40, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
                 .bold()
             
             AppleSignInButton { isNew, fullName in
@@ -31,5 +32,6 @@ struct SignUpPage: View {
             }
         }
         .padding()
+        .background(Color("BackGroundColor"))
     }
 }

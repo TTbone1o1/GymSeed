@@ -72,8 +72,8 @@ struct OnboardingUploadProfile: View {
                     else {
                         Image(systemName: "person.fill")
                             .resizable().scaledToFit()
-                            .frame(width: 40, height: 40)
-                            .foregroundColor(.gray)
+                            .frame(width: 26, height: 26)
+                            .foregroundColor(Color("iconGray"))
                     }
 
                     if isUploading {

@@ -13,6 +13,7 @@ struct OnboardingUserName: View {
     var body: some View {
         VStack(spacing: 24) {
             Text("What should we\ncall you?")
+                .foregroundColor(.white)
                 .font(.title)
                 .fontWeight(.bold)
                 .multilineTextAlignment(.leading)
@@ -21,7 +22,7 @@ struct OnboardingUserName: View {
             TextField("Enter your name", text: $name)
                 .padding()
                 .frame(width: 250, height: 65)
-                .background(Color.gray.opacity(0.1))
+                .background(Color("Grey"))
                 .cornerRadius(10)
         }
         .padding()
